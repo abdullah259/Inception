@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+  nginx:
+    container_name: nginx-container
+    build : .
+    ports : 
+      - "80:80"
+  WordPress:
+    container_name: WordPress-container
+    build: .
+    ports: 
+      - "80:80"
