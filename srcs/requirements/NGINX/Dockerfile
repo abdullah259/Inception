@@ -1,0 +1,17 @@
+FROM debian:buster
+
+RUN apt-get update && apt-get install -y nginx openssl
+
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key \
+ -out /etc/ssl/nginx-selfsigned.crt -subj "/CN=aghazi.42.fr/O=42AD/L=Abu Dhabi/ST=Abu Dhabi/C=AE"
+
+COPY --chown=www-data:www-data /conf/nginx.conf /etc/nginx/sites-available/nginx.conf
+
+
+RUN  ln -s /etc/nginx/sites-available/*.conf /etc/nginx/sites-enabled/
+
+COPY ./conf/portoflio /var/www/html/portoflio
+
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]

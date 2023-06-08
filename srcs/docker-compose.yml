@@ -1,0 +1,138 @@
+version: '3.9'
+
+services:
+
+  nginx:
+    container_name: nginx
+    build: ./requirements/NGINX
+    depends_on:
+        # - adminer
+        - wordpress
+        # - redis
+    ports:
+        - 443:443
+    volumes:
+        - wordpress:/var/www/html/wordpress
+    networks:
+        - my_network
+    restart: always
+
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/WordPress
+    env_file:
+        - .env
+    depends_on:
+        - mariadb
+    ports:
+      - 9000:9000
+    volumes:
+        - wordpress:/var/www/html/wordpress
+    networks:
+        - my_network
+    restart: always
+
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/MariaDB
+      args:
+        DB_DATABASE: ${DB_DATABASE}
+        DB_USER: ${DB_USER}
+        DB_USERPASS: ${DB_USERPASS}
+        DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+        - db:/var/lib/mysql
+    ports:
+      - 3306:3306
+    env_file:
+        - .env
+    networks:
+        - my_network
+    restart: always
+
+  ftp-server:
+    container_name: ftp-server
+    build:
+      context: ./requirements/ftp_server
+      args:
+        FTP_USER: ${FTP_USER}
+        FTP_PASS: ${FTP_PASS}
+    ports:
+      - 20-21:20-21
+      - 4242-4262:4242-4262
+    env_file:
+        - .env
+    volumes:
+        - wordpress:/var/www/html
+    networks:
+        - my_network
+    restart: always
+
+  redis:
+    container_name: redis
+    build: ./requirements/redis
+    env_file:
+        - .env
+    volumes:
+        - wordpress:/var/www/html/wordpress
+    ports:
+      - 6379:6379
+    networks:
+        - my_network
+    restart: always
+
+  adminer:
+    container_name: adminer
+    build: ./requirements/adminer
+    depends_on:
+        - mariadb
+    ports:
+      - 8080:8080
+    env_file:
+        - .env
+    networks:
+        - my_network
+    restart: always
+
+  static_page:
+    container_name: static_page
+    build: ./requirements/static_page
+    ports:
+      - 80:80
+    networks:
+        - my_network
+    restart: always
+
+  portainer:
+    container_name: portainer
+    build:
+      context: ./requirements/portainer
+    ports:
+      - 9443:9443
+    networks:
+      - my_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+networks:
+  my_network:
+      driver: bridge 
+      name: my_network
+
+volumes:
+  db:
+      driver: local
+      name: db
+      driver_opts:
+          type: none
+          o: bind
+          device: /home/aghazi/data/db
+  wordpress:
+      driver: local
+      name: wordpress
+      driver_opts:
+          type: none
+          o: bind
+          device: /home/aghazi/data/wordpress
