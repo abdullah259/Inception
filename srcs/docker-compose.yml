@@ -4,11 +4,11 @@ services:
 
   nginx:
     container_name: nginx
-    build: ./requirements/NGINX
+    build: ./requirements/nginx
     depends_on:
-        # - adminer
+        - adminer
         - wordpress
-        # - redis
+        - redis
     ports:
         - 443:443
     volumes:
@@ -35,7 +35,7 @@ services:
   mariadb:
     container_name: mariadb
     build:
-      context: ./requirements/MariaDB
+      context: ./requirements/mariadb
       args:
         DB_DATABASE: ${DB_DATABASE}
         DB_USER: ${DB_USER}

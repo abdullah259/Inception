@@ -1,5 +1,7 @@
 cd /var/www/html/wordpress
 
+sed -i 's/listen = .*/listen = 0.0.0.0:9000/g' /etc/php/7.3/fpm/pool.d/www/conf
+
 if [ ! -f "/var/www/html/wordpress/wp-content/wp-config.php" ]; then
 
 # Download wordpress files
@@ -27,8 +29,11 @@ wp plugin update --allow-root --all
 wp user create --path="/var/www/html/wordpress" --allow-root $WORDPRESS_DB_USER $WORDPRESS_DB_USER_EMAIL --user_pass=$WORDPRESS_DB_USER_PASSWORD
 # Activate the theme
 # wp theme install $WORDPRESS_THEME --activate --allow-root
-wp --allow-root theme install "ExS Dark" 
-wp --allow-root theme activate "exs-dark"
+# wp --allow-root theme install "ExS Dark" 
+# wp --allow-root theme activate "exs-dark"
+chown -R www-data:www-data /var/www/html/
+chmod -R 775 /var/www/html
+echo "WordPress has been successfully installed."
 # Activate the plugins
 wp plugin update --allow-root --all
 

@@ -14,8 +14,7 @@ down:
 	docker compose -f ${DOCKER-COMPOSE} down
 
 re: clean
-	docker compose -f ${DOCKER-COMPOSE} down
-	docker compose -f ${DOCKER-COMPOSE} up -d --build
+	docker compose -f ${DOCKER-COMPOSE} up --build
 
 clean: 	
 	docker compose -f $(DOCKER-COMPOSE) down
